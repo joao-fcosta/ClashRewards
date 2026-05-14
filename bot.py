@@ -3,7 +3,15 @@ from discord.app_commands import CommandTree
 import aiohttp
 import os
 from keep_alive import keep_alive
+import urllib.request
 
+try:
+    with urllib.request.urlopen('https://api.ipify.org') as response:
+        meu_ip_render = response.read().decode().strip()
+    print(f"🌐 ATENÇÃO! O IP público deste servidor no Render é: {meu_ip_render}")
+except Exception as e:
+    print(f"Não foi possível obter o IP: {e}")
+    
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 SUPERCELL_API_KEY = os.getenv("SUPERCELL_API_KEY")
 
