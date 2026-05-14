@@ -101,12 +101,10 @@ def calcular_recompensas(nivel: int) -> dict:
 # ==========================================
 class ClashClient(discord.Client):
     def __init__(self):
-        # Intents básicos são suficientes para slash commands
         super().__init__(intents=discord.Intents.default())
         self.tree = CommandTree(self)
 
     async def setup_hook(self):
-        # Sincroniza os slash commands com o Discord ao iniciar
         await self.tree.sync()
 
 client = ClashClient()
@@ -120,14 +118,12 @@ async def on_ready():
 # ==========================================
 @client.tree.command(name="status", description="Calcula as recompensas e o novo nível do Clash Royale")
 async def status_clash(interaction: discord.Interaction, tag: str):
-    # O bot precisa responder rapidamente, então "adiamos" a resposta para ele pensar
     await interaction.response.defer()
 
     clean_tag = tag.replace("#", "").upper()
     url = f"https://api.clashroyale.com/v1/players/%23{clean_tag}"
     headers = {"Authorization": f"Bearer {SUPERCELL_API_KEY}"}
 
-    # Usando aiohttp para requisições assíncronas (não trava o bot)
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             if response.status != 200:
@@ -136,7 +132,6 @@ async def status_clash(interaction: discord.Interaction, tag: str):
             
             player_data = await response.json()
 
-    # Processamento dos dados
     cartas = player_data.get("cards", [])
     tropas = player_data.get("supportCards", [])
     
@@ -154,7 +149,6 @@ async def status_clash(interaction: discord.Interaction, tag: str):
     )
     
     embed.add_field(name="📈 Nível de Coleção", value=f"**{nivel_colecao}**", inline=False)
-    
     embed.add_field(name="👑 Torre do Rei", value=f"Antigo: Nível **{nivel_atual_rei}**\nNovo: Nível **{novo_nivel_rei}**", inline=False)
     
     recomp_texto = (
@@ -165,7 +159,8 @@ async def status_clash(interaction: discord.Interaction, tag: str):
     )
     embed.add_field(name="🏆 Recompensas da Celebração", value=recomp_texto, inline=False)
     
-    embed.set_thumbnail(url="https://api-assets.clashroyale.com/arenas/512/arena1.png") # Uma imagem genérica de arena
+    embed.set_thumbnail(url="https://fankit.supercell.com/d/BmehSDJrZNff/game-assets-1/show/eyJpZCI6MTQ4MTc0LCJzY29wZSI6ImFzc2V0OnZpZXciLCJ0aW1lc3RhbXAiOiIxNzc4NzgzNjkxIn0:supercell:pHb_vUO6ueBPqRnXG-t6ln5ElqRT9xjQJY07turHkmQ") # Uma imagem genérica de arena
+    embed.set_footer(text="Artigo da atualização: https://supercell.com/en/games/clashroyale/blog/news/new-collection-levels-and-mastery-changes/")
     embed.set_footer(text="Bot de Consulta Clash Royale")
 
     # Envia a resposta final substituindo o "defer"
