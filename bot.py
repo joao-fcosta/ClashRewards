@@ -142,13 +142,17 @@ async def status_clash(interaction: discord.Interaction, tag: str):
     nome_jogador = player_data.get("name", "Desconhecido")
 
     embed = discord.Embed(
-        title=nome_jogador,
+        title=f"**{nome_jogador}**",
         color=discord.Color.blue(),
         description=f"Tag: `#{clean_tag}`\n📰 [Baseado no artigo da atualização](https://supercell.com/en/games/clashroyale/blog/news/new-collection-levels-and-mastery-changes/)"
     )
     
     embed.add_field(name="📈 Nível de Coleção", value=f"**{nivel_colecao}**", inline=False)
-    embed.add_field(name="👑 Torre do Rei", value=f"Antigo: Nível **{nivel_atual_rei}**\nNovo: Nível **{novo_nivel_rei}**", inline=False)
+    
+    if novo_nivel_rei == nivel_atual_rei:
+        embed.add_field(name="👑 Torre do Rei", value=f"Nível **{nivel_atual_rei}** (sem mudanças)", inline=False)
+    else:
+        embed.add_field(name="👑 Torre do Rei", value=f"Antigo: Nível **{nivel_atual_rei}**\nNovo: Nível **{novo_nivel_rei}**", inline=False)
 
     linhas_recompensas = []
     
