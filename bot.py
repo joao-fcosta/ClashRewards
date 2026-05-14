@@ -141,29 +141,39 @@ async def status_clash(interaction: discord.Interaction, tag: str):
     nivel_atual_rei = calcular_nivel_rei_antigo(player_data.get("expLevel", 1))
     nome_jogador = player_data.get("name", "Desconhecido")
 
-    # Criação do Embed (Mensagem formatada bonitona)
     embed = discord.Embed(
-        title= nome_jogador,
+        title=nome_jogador,
         color=discord.Color.blue(),
-        description=f"Tag: `#{clean_tag}`"
+        description=f"Tag: `#{clean_tag}`\n📰 [Ler artigo da atualização](https://supercell.com/en/games/clashroyale/blog/news/new-collection-levels-and-mastery-changes/)"
     )
     
     embed.add_field(name="📈 Nível de Coleção", value=f"**{nivel_colecao}**", inline=False)
     embed.add_field(name="👑 Torre do Rei", value=f"Antigo: Nível **{nivel_atual_rei}**\nNovo: Nível **{novo_nivel_rei}**", inline=False)
+
+    linhas_recompensas = []
     
-    recomp_texto = (
-        f"💎 Gemas: **{recompensas['gems']}**\n"
-        f"📦 Baús Mágicos de 5★: **{recompensas['baus']}**\n"
-        f"🚩 Ilustrações de Bandeiras: **{recompensas['bandeiras']}**\n"
-        f"🏰 Visual da Torre: **{recompensas['pele']}**"
-    )
+    if recompensas['gems'] != "0":  
+        linhas_recompensas.append(f"💎 Gemas: **{recompensas['gems']}**")
+        
+    if recompensas['baus'] > 0:
+        linhas_recompensas.append(f"📦 Baús Mágicos de 5★: **{recompensas['baus']}**")
+        
+    if recompensas['bandeiras'] > 0:
+        linhas_recompensas.append(f"🚩 Ilustrações de Bandeiras: **{recompensas['bandeiras']}**")
+        
+    if recompensas['pele'] > 0:
+        linhas_recompensas.append(f"🏰 Visual da Torre: **{recompensas['pele']}**")
+
+    if linhas_recompensas:
+        recomp_texto = "\n".join(linhas_recompensas)
+    else:
+        recomp_texto = "Nenhuma recompensa atingida ainda. Continue evoluindo!"
+
     embed.add_field(name="🏆 Recompensas da Celebração", value=recomp_texto, inline=False)
-    
-    embed.set_thumbnail(url="https://fankit.supercell.com/d/BmehSDJrZNff/game-assets-1/show/eyJpZCI6MTQ4MTc0LCJzY29wZSI6ImFzc2V0OnZpZXciLCJ0aW1lc3RhbXAiOiIxNzc4NzgzNjkxIn0:supercell:pHb_vUO6ueBPqRnXG-t6ln5ElqRT9xjQJY07turHkmQ") # Uma imagem genérica de arena
-    embed.set_footer(text="Artigo da atualização: https://supercell.com/en/games/clashroyale/blog/news/new-collection-levels-and-mastery-changes/")
+
+    embed.set_thumbnail(url="https://fankit.supercell.com/d/BmehSDJrZNff/game-assets-1/show/eyJpZCI6MTQ4MTc0LCJzY29wZSI6ImFzc2V0OnZpZXciLCJ0aW1lc3RhbXAiOiIxNzc4NzgzNjkxIn0:supercell:pHb_vUO6ueBPqRnXG-t6ln5ElqRT9xjQJY07turHkmQ")
     embed.set_footer(text="Bot de Consulta Clash Royale")
 
-    # Envia a resposta final substituindo o "defer"
     await interaction.followup.send(embed=embed)
 
 keep_alive()
