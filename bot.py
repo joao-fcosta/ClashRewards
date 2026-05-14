@@ -144,7 +144,7 @@ async def status_clash(interaction: discord.Interaction, tag: str):
     embed = discord.Embed(
         title=nome_jogador,
         color=discord.Color.blue(),
-        description=f"Tag: `#{clean_tag}`\n📰 [Ler artigo da atualização](https://supercell.com/en/games/clashroyale/blog/news/new-collection-levels-and-mastery-changes/)"
+        description=f"Tag: `#{clean_tag}`\n📰 [Baseado no artigo da atualização](https://supercell.com/en/games/clashroyale/blog/news/new-collection-levels-and-mastery-changes/)"
     )
     
     embed.add_field(name="📈 Nível de Coleção", value=f"**{nivel_colecao}**", inline=False)
@@ -171,7 +171,6 @@ async def status_clash(interaction: discord.Interaction, tag: str):
 
     embed.add_field(name="🏆 Recompensas da Celebração", value=recomp_texto, inline=False)
 
-    embed.set_thumbnail(url="https://fankit.supercell.com/d/BmehSDJrZNff/game-assets-1/show/eyJpZCI6MTQ4MTc0LCJzY29wZSI6ImFzc2V0OnZpZXciLCJ0aW1lc3RhbXAiOiIxNzc4NzgzNjkxIn0:supercell:pHb_vUO6ueBPqRnXG-t6ln5ElqRT9xjQJY07turHkmQ")
     embed.set_footer(text="Bot de Consulta Clash Royale")
 
     await interaction.followup.send(embed=embed)
