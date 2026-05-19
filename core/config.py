@@ -1,0 +1,4 @@
+import os
+
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+SUPERCELL_API_KEY = os.getenv("SUPERCELL_API_KEY")
