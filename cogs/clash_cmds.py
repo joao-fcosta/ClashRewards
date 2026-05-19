@@ -8,7 +8,10 @@ class ClashCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="coleção", description="Calcula as recompensas e o novo nível do Clash Royale")
+    # ==========================================
+    # COMANDO 1: COLEÇÃO
+    # ==========================================
+    @app_commands.command(name="colecao", description="Calcula as recompensas e o novo nível de coleção do Clash Royale")
     async def status_clash(self, interaction: discord.Interaction, tag: str):
         await interaction.response.defer()
 
@@ -48,7 +51,47 @@ class ClashCommands(commands.Cog):
         recomp_texto = "\n".join(linhas_recompensas) if linhas_recompensas else "Nenhuma recompensa atingida ainda. Continue evoluindo!"
         embed.add_field(name="🏆 Recompensas da Celebração", value=recomp_texto, inline=False)
         
-        embed.set_thumbnail(url="https://fankit.supercell.com/d/BmehSDJrZNff/game-assets-1/show/eyJpZCI6MTQ4MTc0LCJzY29wZSI6ImFzc2V0OnZpZXciLCJ0aW1lc3RhbXAiOiIxNzc4NzgzNjkxIn0:supercell:pHb_vUO6ueBPqRnXG-t6ln5ElqRT9xjQJY07turHkmQ")
+        embed.set_footer(text="Bot de Consulta Clash Royale")
+
+        await interaction.followup.send(embed=embed)
+        
+    # ==========================================
+    # COMANDO 2: PRÓXIMO NÍVEL DO REI
+    # ==========================================
+    # Ajustado: removido o espaço do name (usando underline)
+    @app_commands.command(name="proximo_nivel", description="Calcula qual a maneira mais rápida de subir o nível do rei")
+    async def proximo_nivel_rei(self, interaction: discord.Interaction, tag: str):
+        await interaction.response.defer()
+
+        player_data, clean_tag = await fetch_player_data(tag)
+        
+        if not player_data:
+            await interaction.followup.send(f"❌ Erro ao buscar jogador. Verifique a Tag: `#{clean_tag}`")
+            return
+
+        cartas = player_data.get("cards", [])
+        nome_jogador = player_data.get("name", "Desconhecido")
+        
+        progresso = calculator.calcular_progresso_rei(cartas)
+
+        # Ajustado: Criação do objeto embed que estava faltando!
+        embed = discord.Embed(
+            title=f"👑 Progresso do Rei - {nome_jogador}",
+            color=discord.Color.gold(),
+            description=f"Tag: `#{clean_tag}`"
+        )
+
+        if progresso["maximo"]:
+            texto_progresso = "👑 **Nível Máximo Alcançado!** Você já está no topo."
+        else:
+            texto_progresso = (
+                f"Rumo ao Nível **{progresso['proximo_nivel']}**\n"
+                f"Falta upar: **{progresso['cartas_faltantes']} cartas** para o nível **{progresso['nivel_exigido']}**\n"
+                f"Progresso: `{progresso['progresso_atual']}/{progresso['total_exigido']}`"
+            )
+
+        # Adiciona o campo no Embed do Discord
+        embed.add_field(name="📊 Resumo", value=texto_progresso, inline=False)
         embed.set_footer(text="Bot de Consulta Clash Royale")
 
         await interaction.followup.send(embed=embed)

@@ -2,12 +2,75 @@ BASE_LEVELS = {
     "common": 1, "rare": 3, "epic": 6,
     "legendary": 9, "champion": 11
 }
+# Mapeamento exato de quantas cartas e qual nível são exigidos para cada Nível do Rei
+REQUISITOS_REI = {
+    2: {"qtd": 9, "nivel": 1},
+    3: {"qtd": 9, "nivel": 2},
+    4: {"qtd": 10, "nivel": 3},
+    5: {"qtd": 10, "nivel": 4},
+    6: {"qtd": 10, "nivel": 5},
+    7: {"qtd": 10, "nivel": 6},
+    8: {"qtd": 10, "nivel": 7},
+    9: {"qtd": 10, "nivel": 8},
+    10: {"qtd": 10, "nivel": 9},
+    11: {"qtd": 10, "nivel": 10},
+    12: {"qtd": 11, "nivel": 11},
+    13: {"qtd": 11, "nivel": 12},
+    14: {"qtd": 12, "nivel": 13},
+    15: {"qtd": 13, "nivel": 14},
+    16: {"qtd": 14, "nivel": 15}
+}
+
+def calcular_progresso_rei(cartas: list) -> dict:
+    """Calcula o progresso do jogador rumo ao próximo Nível do Rei."""
+    nivel_atual = calcular_novo_nivel_rei(cartas)
+    
+    # Se já está no nível máximo, não há próximo nível
+    if nivel_atual == 16:
+        return {
+            "maximo": True,
+            "mensagem": "Nível Máximo Alcançado!"
+        }
+        
+    proximo_nivel = nivel_atual + 1
+    requisito = REQUISITOS_REI[proximo_nivel]
+    
+    qtd_exigida = requisito["qtd"]
+    nivel_exigido = requisito["nivel"]
+    
+    # Pegamos os níveis absolutos de todas as cartas
+    niveis_absolutos = obter_niveis_ordenados(cartas)
+    
+    # Contamos quantas cartas o jogador JÁ TEM no nível exigido (ou superior)
+    cartas_prontas = sum(1 for nivel in niveis_absolutos if nivel >= nivel_exigido)
+    
+    # A diferença é o quanto falta
+    cartas_faltantes = qtd_exigida - cartas_prontas
+    
+    return {
+        "maximo": False,
+        "proximo_nivel": proximo_nivel,
+        "cartas_faltantes": cartas_faltantes,
+        "nivel_exigido": nivel_exigido,
+        "progresso_atual": cartas_prontas,
+        "total_exigido": qtd_exigida
+    }
+
+# 1. Função que cuida APENAS da matemática de uma única carta
+def calcular_nivel_absoluto(carta: dict) -> int:
+    raridade = carta.get("rarity", "common")
+    nivel_api = carta.get("level", 1)
+    
+    return BASE_LEVELS.get(raridade, 1) + nivel_api - 1
+
+def obter_niveis_ordenados(cartas: list) -> list:
+    niveis = [calcular_nivel_absoluto(carta) for carta in cartas]
+    
+    return sorted(niveis, reverse=True)
+
 
 def calcular_novo_nivel_rei(cartas: list) -> int:
-    niveis_absolutos = sorted(
-        [BASE_LEVELS.get(c.get("rarity", "common"), 1) + c.get("level", 1) - 1 for c in cartas],
-        reverse=True
-    )
+    niveis_absolutos = obter_niveis_ordenados(cartas)
     
     def tem_cartas(qtd, lvl):
         return len(niveis_absolutos) >= qtd and niveis_absolutos[qtd - 1] >= lvl
